@@ -8,6 +8,8 @@ import { requireAuth } from '../middleware/auth.js'
 const router = Router()
 router.use(requireAuth)
 
+// profil user
+
 // GET /api/profiles/me
 router.get('/me', async (req, res) => {
   try {

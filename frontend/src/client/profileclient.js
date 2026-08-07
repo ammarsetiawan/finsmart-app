@@ -10,14 +10,14 @@ const fmt = (n) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n || 0)
 
 export default function Profile() {
-  const [profile,  setProfile]  = useState(null)
-  const [user,     setUser]     = useState(null)
-  const [loading,  setLoading]  = useState(true)
-  const [editing,  setEditing]  = useState(false)
-  const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState(null)
-  const [success,  setSuccess]  = useState(false)
-  const [form,     setForm]     = useState({ full_name: '', monthly_income: '' })
+  const [profile, setProfile] = useState(null)
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(false)
+  const [form, setForm] = useState({ full_name: '', monthly_income: '' })
 
   useEffect(() => { loadAll() }, [])
 
@@ -29,7 +29,7 @@ export default function Profile() {
       const r = await profileService.getMe()
       setProfile(r.data.data)
       setForm({
-        full_name:      r.data.data.fullName      || '',
+        full_name: r.data.data.fullName || '',
         monthly_income: r.data.data.monthlyIncome || '',
       })
     } catch (e) { console.error(e) }
@@ -40,7 +40,7 @@ export default function Profile() {
     setSaving(true); setError(null)
     try {
       await profileService.update({
-        full_name:      form.full_name,
+        full_name: form.full_name,
         monthly_income: parseFloat(form.monthly_income) || 0,
       })
       await loadAll()
@@ -57,7 +57,7 @@ export default function Profile() {
     setEditing(false)
     setError(null)
     setForm({
-      full_name:      profile?.fullName      || '',
+      full_name: profile?.fullName || '',
       monthly_income: profile?.monthlyIncome || '',
     })
   }
@@ -164,12 +164,19 @@ export default function Profile() {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-gray-400 tracking-wide mb-1">GAJI BULANAN</p>
                 {editing ? (
-                  <input
-                    type="number" min="0" value={form.monthly_income}
-                    onChange={e => setForm({ ...form, monthly_income: e.target.value })}
-                    placeholder="0"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                  />
+                  <>
+                    <input
+                      type="number" min="0" value={form.monthly_income}
+                      onChange={e => setForm({ ...form, monthly_income: e.target.value })}
+                      placeholder="0"
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    />
+                    {form.monthly_income && parseFloat(form.monthly_income) > 0 && (
+                      <p className="text-sm font-bold text-gray-800 mt-1.5">
+                        {fmt(parseFloat(form.monthly_income))}
+                      </p>
+                    )}
+                  </>
                 ) : (
                   <p className="text-sm font-medium text-gray-800">
                     {profile?.monthlyIncome && parseFloat(profile.monthlyIncome) > 0

@@ -1,8 +1,6 @@
 import Categories from '@/client/categoriesclient'
 import { ProtectedRoute } from '@/lib/protected-route'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata = {
   title:       'Kategori',
   description: 'Kelola kategori transaksi — Pribadi, Keluarga, dan Tabungan.',

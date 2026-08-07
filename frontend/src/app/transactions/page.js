@@ -1,8 +1,6 @@
 import Transaction from '@/client/transactionsclient'
 import { ProtectedRoute } from '@/lib/protected-route'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata = {
   title:       'Transaksi',
   description: 'Catat dan kelola semua transaksi keuangan harian. Filter berdasarkan kategori, tipe, dan periode.',

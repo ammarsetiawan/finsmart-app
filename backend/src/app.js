@@ -10,6 +10,8 @@ import categoryRoutes    from './routes/categories.js'
 import budgetRoutes      from './routes/budgets.js'
 import allocationRoutes  from './routes/allocations.js'
 import profileRoutes     from './routes/profiles.js'
+import balanceRoutes     from './routes/balance.js'
+import adminRoutes       from './routes/admin.js'
 
 const app  = express()
 const PORT = process.env.PORT || 5000
@@ -43,6 +45,8 @@ app.use('/api/categories',   categoryRoutes)
 app.use('/api/budgets',      budgetRoutes)
 app.use('/api/allocations',  allocationRoutes)
 app.use('/api/profiles',     profileRoutes)
+app.use('/api/balance',      balanceRoutes)
+app.use('/api/admin',        adminRoutes)
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() }))
 

@@ -6,6 +6,7 @@ export const profiles = pgTable('profiles', {
   userId:        text('user_id').notNull().unique(),
   fullName:      text('full_name').notNull(),
   monthlyIncome: numeric('monthly_income', { precision: 15, scale: 2 }).default('0'),
+  balance:       numeric('balance', { precision: 15, scale: 2 }).default('0'),
   currency:      text('currency').notNull().default('IDR'),
   createdAt:     timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt:     timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

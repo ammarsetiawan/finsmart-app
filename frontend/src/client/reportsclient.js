@@ -507,9 +507,42 @@ export default function Report() {
         y += h + 2
       }
 
+      // Truncasi teks agar pas dengan lebar kolom (menggunakan ukuran font aktual)
+      function fitText(text, width) {
+        const str  = String(text ?? '')
+        const padX = 3 // ruang aman kiri+kanan
+        const maxW = Math.max(width - padX, 1)
+        if (pdf.getTextWidth(str) <= maxW) return str
+        let result = str
+        while (result.length > 1 && pdf.getTextWidth(result + '…') > maxW) {
+          result = result.slice(0, -1)
+        }
+        return result + '…'
+      }
+
+      function tableRow(cols, data, isEven) {
+        checkPage(7)
+        const h = 8
+        pdf.setFillColor(isEven ? 249 : 255, isEven ? 250 : 255, isEven ? 251 : 255)
+        pdf.rect(ml, y, cw, h, 'F')
+        pdf.setDrawColor(229, 231, 235)
+        pdf.rect(ml, y, cw, h, 'S')
+        let x = ml
+        // Simpan font aktif untuk perhitungan yang konsisten
+        const activeSize = pdf.getFontSize()
+        cols.forEach(({ w, align }, i) => {
+          pdf.setFontSize(activeSize)
+          const val  = fitText(data[i], w)
+          const opts = align === 'right' ? { align: 'right' } : {}
+          const tx   = align === 'right' ? x + w - 2 : x + 2
+          pdf.text(val, tx, y + 5.2, opts)
+        })
+        y += h
+      }
+
       function tableHeader(cols) {
         checkPage(8)
-        const h = 7
+        const h = 8
         pdf.setFillColor(55, 65, 81)
         pdf.rect(ml, y, cw, h, 'F')
         pdf.setFont('helvetica', 'bold')
@@ -517,29 +550,13 @@ export default function Report() {
         pdf.setTextColor(255, 255, 255)
         let x = ml
         cols.forEach(({ label, w, align }) => {
+          const str = String(label ?? '')
           if (align === 'right') {
-            pdf.text(label, x + w - 2, y + 4.8, { align: 'right' })
+            pdf.text(str, x + w - 2, y + 5.2, { align: 'right' })
           } else {
-            pdf.text(label, x + 2, y + 4.8)
+            pdf.text(str, x + 2, y + 5.2)
           }
           x += w
-        })
-        y += h
-      }
-
-      function tableRow(cols, data, isEven) {
-        checkPage(7)
-        const h = 6.5
-        pdf.setFillColor(isEven ? 249 : 255, isEven ? 250 : 255, isEven ? 251 : 255)
-        pdf.rect(ml, y, cw, h, 'F')
-        pdf.setDrawColor(229, 231, 235)
-        pdf.rect(ml, y, cw, h, 'S')
-        let x = ml
-        cols.forEach(({ w, align }, i) => {
-          const val  = String(data[i] ?? '')
-          const opts = align === 'right' ? { align: 'right' } : {}
-          const tx   = align === 'right' ? x + w - 2 : x + 2
-          pdf.text(val, tx, y + 4.3, opts)
         })
         y += h
       }

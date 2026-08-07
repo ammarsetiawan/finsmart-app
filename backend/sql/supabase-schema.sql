@@ -8,10 +8,14 @@ create table if not exists profiles (
   user_id text not null unique,
   full_name text not null,
   monthly_income numeric(15,2) default '0',
+  balance numeric(15,2) not null default '0',
   currency text not null default 'IDR',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+
+alter table profiles add column if not exists balance numeric(15,2) not null default '0';
 
 create table if not exists categories (
   id text primary key,

@@ -8,6 +8,7 @@ import { requireAuth } from '../middleware/auth.js'
 const router = Router()
 router.use(requireAuth)
 
+
 router.get('/', async (req, res) => {
   try {
     const rows = await db.query.allocationRules.findMany({

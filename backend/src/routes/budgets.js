@@ -8,6 +8,8 @@ import { requireAuth } from '../middleware/auth.js'
 const router = Router()
 router.use(requireAuth)
 
+// routing budget
+
 router.get('/', async (req, res) => {
   try {
     const now   = new Date()

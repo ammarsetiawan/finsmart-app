@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
     Menu, X, LayoutDashboard, ArrowLeftRight, Target,
-    BarChart2, Tag, User, LogOut, ChevronDown
+    BarChart2, Tag, User, LogOut, ChevronDown, Wallet, ShieldCheck
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,6 +17,8 @@ const NAV_ITEMS = [
     { label: 'BUDGET', href: '/budgets', icon: Target },
     { label: 'LAPORAN', href: '/reports', icon: BarChart2 },
     { label: 'KATEGORI', href: '/categories', icon: Tag },
+    { label: 'SALDO', href: '/balance', icon: Wallet },
+    { label: 'ADMIN', href: '/admin', icon: ShieldCheck },
 ]
 
 export default function Navbar() {

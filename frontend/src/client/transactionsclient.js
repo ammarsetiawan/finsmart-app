@@ -118,6 +118,18 @@ function TransactionModal({ open, onClose, onSave, categories }) {
               placeholder="0"
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
+            {form.amount && parseFloat(form.amount) > 0 && (
+              <div className={`mt-2 flex items-center justify-between rounded-xl px-3 py-2 text-sm font-bold border ${
+                form.type === 'income'
+                  ? 'bg-green-50 text-green-600 border-green-200'
+                  : 'bg-red-50 text-red-500 border-red-200'
+              }`}>
+                <span className="text-xs font-semibold uppercase tracking-wide opacity-70">
+                  {form.type === 'income' ? '▶ Pemasukan' : '▼ Pengeluaran'}
+                </span>
+                <span className="tabular-nums">{form.type === 'income' ? '+' : '−'}{fmt(parseFloat(form.amount))}</span>
+              </div>
+            )}
           </div>
 
           {/* Kategori & Tanggal */}

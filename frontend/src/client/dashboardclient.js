@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   ChevronUp, ChevronDown, Wallet, Lock, Menu, X,
   LayoutDashboard, ArrowLeftRight, Target, BarChart2, Tag,
-  User, LogOut
+  User, LogOut, PlusCircle, Save, RefreshCw,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import Image from 'next/image';
@@ -211,19 +211,7 @@ export default function Dashboard() {
 
         </div>
 
-        {/* Bottom Buttons */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-8">
-          {[
-            { label: '← Transaksi →', href: '/transactions', grad: 'from-teal-400 to-teal-500' },
-            { label: 'Mode Gajian →',  href: '/allocations',  grad: 'from-cyan-400 to-cyan-500' },
-          ].map(({ label, href, grad }) => (
-            <Link key={label} href={href}
-              className={`block w-full bg-gradient-to-r ${grad} rounded-2xl p-5 text-white text-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 font-bold text-base`}
-            >
-              {label}
-            </Link>
-          ))}
-        </div> */}
+        
 
       </div>
     </div>

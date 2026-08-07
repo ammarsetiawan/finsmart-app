@@ -90,8 +90,9 @@ const options = {
       { name: 'Dashboard',    description: 'Ringkasan, insight, dan progress budget' },
       { name: 'Allocations',  description: 'Aturan alokasi gaji & Mode Gajian' },
       { name: 'Categories',   description: 'Kelola kategori transaksi' },
-      { name: 'Budgets',      description: 'Set & pantau limit pengeluaran' },
+{ name: 'Budgets',      description: 'Set & pantau limit pengeluaran' },
       { name: 'Profiles',     description: 'Data profil user' },
+      { name: 'Balance',      description: 'Kelola saldo dan pemasukan saldo (top-up)' },
     ],
     paths: {
       '/api/transactions': {
@@ -442,6 +443,62 @@ const options = {
             },
           },
           responses: { 201: { description: 'Created' } },
+        },
+      },
+'/api/balance': {
+        get: {
+          tags: ['Balance'],
+          summary: 'Ambil saldo saat ini',
+          responses: {
+            200: { description: 'OK', content: { 'application/json': { schema: { type: 'object', properties: { data: { type: 'object', properties: { balance: { type: 'string', example: '0' } } } } } } } },
+            401: { description: 'Unauthorized' },
+          },
+        },
+        post: {
+          tags: ['Balance'],
+          summary: 'Pemasukan saldo (top-up)',
+          description: 'Menambahkan jumlah ke saldo yang sudah ada, lalu menyimpan hasilnya ke Supabase.',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['amount'],
+                  properties: {
+                    amount: { type: 'number', example: 500000 },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: { description: 'Created — saldo berhasil ditambahkan' },
+            400: { description: 'amount tidak valid' },
+            404: { description: 'Profil tidak ditemukan' },
+          },
+        },
+        put: {
+          tags: ['Balance'],
+          summary: 'Set saldo absolut (ganti nilai)',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['amount'],
+                  properties: {
+                    amount: { type: 'number', example: 500000 },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: { description: 'OK' },
+            400: { description: 'amount tidak valid' },
+          },
         },
       },
       '/api/health': {

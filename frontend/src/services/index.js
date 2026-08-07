@@ -45,3 +45,16 @@ export const profileService = {
   create:      (data)          => api.post('/api/profiles', data),
   update:      (data)          => api.put('/api/profiles/me', data),
 }
+
+// ── Balance ───────────────────────────────────────────────────
+export const balanceService = {
+  get:   ()            => api.get('/api/balance'),
+  topup: (amount, categoryId) => api.post('/api/balance', { amount, category_id: categoryId || null }),
+  set:   (amount)      => api.put('/api/balance', { amount }),
+}
+
+// ── Admin / Monitoring ────────────────────────────────────────
+export const adminService = {
+  getMe:   () => api.get('/api/admin/me'),
+  monitor: () => api.get('/api/admin/monitor'),
+}
