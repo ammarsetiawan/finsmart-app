@@ -3,6 +3,7 @@ import { eq, and, gte, lte, sql } from 'drizzle-orm'
 import { db } from '../db/index.js'
 import { transactions, budgets, categories } from '../db/schema.js'
 import { requireAuth } from '../middleware/auth.js'
+import { cacheRead } from '../middleware/cache.js'
 
 const router = Router()
 router.use(requireAuth)
@@ -14,7 +15,7 @@ const range = (month, year) => {
 }
 
 // GET /api/dashboard/summary?month=&year=
-router.get('/summary', async (req, res) => {
+router.get('/summary', cacheRead({ ttl: 10 }), async (req, res) => {
   try {
     console.log('[dashboard/summary] user:', req.user?.id)
     const now   = new Date()
@@ -66,7 +67,7 @@ router.get('/summary', async (req, res) => {
 })
 
 // GET /api/dashboard/insight?month=&year=
-router.get('/insight', async (req, res) => {
+router.get('/insight', cacheRead({ ttl: 10 }), async (req, res) => {
   try {
     const now   = new Date()
     const month = parseInt(req.query.month) || now.getMonth() + 1
@@ -109,7 +110,7 @@ router.get('/insight', async (req, res) => {
 })
 
 // GET /api/dashboard/budgets?month=&year=
-router.get('/budgets', async (req, res) => {
+router.get('/budgets', cacheRead({ ttl: 10 }), async (req, res) => {
   try {
     console.log('[dashboard/budgets] user:', req.user?.id)
     const now   = new Date()

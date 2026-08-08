@@ -4,6 +4,7 @@ import { createId } from '@paralleldrive/cuid2'
 import { db } from '../db/index.js'
 import { profiles } from '../db/schema.js'
 import { requireAuth } from '../middleware/auth.js'
+import { cacheRead, bustUserCache } from '../middleware/cache.js'
 
 const router = Router()
 router.use(requireAuth)
@@ -11,7 +12,7 @@ router.use(requireAuth)
 // profil user
 
 // GET /api/profiles/me
-router.get('/me', async (req, res) => {
+router.get('/me', cacheRead({ ttl: 20 }), async (req, res) => {
   try {
     const row = await db.query.profiles.findFirst({
       where: eq(profiles.userId, req.user.id),
@@ -44,6 +45,7 @@ router.post('/', async (req, res) => {
       monthlyIncome: monthlyIncome !== undefined ? String(monthlyIncome) : '0',
     }).returning()
 
+    bustUserCache(req.user.id)
     res.status(201).json({ data: row[0] })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
@@ -68,6 +70,7 @@ router.put('/me', async (req, res) => {
       .returning()
 
     if (!row.length) return res.status(404).json({ error: 'Profil tidak ditemukan' })
+    bustUserCache(req.user.id)
     res.json({ data: row[0] })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })

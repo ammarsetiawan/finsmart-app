@@ -119,11 +119,13 @@ function CustomTooltip({ active, payload }) {
 // ── Halaman Laporan ────────────────────────────────────────────
 export default function Report() {
   const [loading,      setLoading]      = useState(true)
+  const [loaded,       setLoaded]       = useState(false) // data sudah berhasil dimuat (cegah flash Rp0)
   const [exporting,    setExporting]    = useState(null) // 'pdf' | 'excel' | null
   const [summary,      setSummary]      = useState(null)
   const [insight,      setInsight]      = useState([])
   const [transactions, setTransactions] = useState([])
   const [activeTab,    setActiveTab]    = useState('alokasi')
+  const [loadError,    setLoadError]    = useState(null)
 
   const now  = new Date()
   const [month, setMonth] = useState(now.getMonth() + 1)
@@ -134,6 +136,7 @@ export default function Report() {
 
   async function loadAll() {
     setLoading(true)
+    setLoadError(null)
     try {
       const [s, i, t] = await Promise.all([
         dashboardService.getSummary(month, year),
@@ -143,7 +146,12 @@ export default function Report() {
       setSummary(s.data.data)
       setInsight(i.data.data)
       setTransactions(t.data.data)
-    } catch (e) { console.error(e) }
+      setLoaded(true)
+    } catch (e) {
+      console.error(e)
+      setLoaded(false)
+      setLoadError('Gagal memuat data. Pastikan backend berjalan, lalu coba lagi.')
+    }
     setLoading(false)
   }
 
@@ -780,7 +788,18 @@ export default function Report() {
           </div>
         </div>
 
-        {loading ? (
+        {loadError && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center justify-between gap-3">
+            <span>{loadError}</span>
+            <button onClick={loadAll}
+              className="flex-shrink-0 px-3 py-1.5 border border-red-300 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors"
+            >
+              Muat Ulang
+            </button>
+          </div>
+        )}
+
+        {loading || !loaded ? (
           <div className="flex items-center justify-center py-24">
             <p className="text-gray-400 animate-pulse">Memuat laporan...</p>
           </div>

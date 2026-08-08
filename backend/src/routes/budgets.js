@@ -4,13 +4,14 @@ import { createId } from '@paralleldrive/cuid2'
 import { db } from '../db/index.js'
 import { budgets } from '../db/schema.js'
 import { requireAuth } from '../middleware/auth.js'
+import { cacheRead, bustUserCache } from '../middleware/cache.js'
 
 const router = Router()
 router.use(requireAuth)
 
 // routing budget
 
-router.get('/', async (req, res) => {
+router.get('/', cacheRead({ ttl: 8 }), async (req, res) => {
   try {
     const now   = new Date()
     const month = parseInt(req.query.month) || now.getMonth() + 1
@@ -34,6 +35,7 @@ router.post('/', async (req, res) => {
       periodMonth: period_month || now.getMonth() + 1,
       periodYear:  period_year  || now.getFullYear(),
     }).returning()
+    bustUserCache(req.user.id)
     res.status(201).json({ data: row[0] })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
@@ -45,6 +47,7 @@ router.put('/:id', async (req, res) => {
       .where(and(eq(budgets.id, req.params.id), eq(budgets.userId, req.user.id)))
       .returning()
     if (!row.length) return res.status(404).json({ error: 'Tidak ditemukan' })
+    bustUserCache(req.user.id)
     res.json({ data: row[0] })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
@@ -52,6 +55,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     await db.delete(budgets).where(and(eq(budgets.id, req.params.id), eq(budgets.userId, req.user.id)))
+    bustUserCache(req.user.id)
     res.json({ message: 'Berhasil dihapus' })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })

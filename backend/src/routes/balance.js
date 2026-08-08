@@ -4,12 +4,13 @@ import { createId } from '@paralleldrive/cuid2'
 import { db } from '../db/index.js'
 import { transactions } from '../db/schema.js'
 import { requireAuth } from '../middleware/auth.js'
+import { cacheRead, bustUserCache } from '../middleware/cache.js'
 
 const router = Router()
 router.use(requireAuth)
 
 // GET /api/balance — total pemasukan bulan ini (income)
-router.get('/', async (req, res) => {
+router.get('/', cacheRead({ ttl: 8 }), async (req, res) => {
   try {
     const now   = new Date()
     const month = parseInt(req.query.month) || now.getMonth() + 1
@@ -59,6 +60,7 @@ router.post('/', async (req, res) => {
       transactionDate: new Date().toISOString().split('T')[0],
     }).returning()
 
+    bustUserCache(req.user.id)
     res.status(201).json({ data: row[0] })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })

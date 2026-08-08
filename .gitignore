@@ -5,3 +5,5 @@ node_modules
 dist
 drizzle
 *.exe
+logs-backend.*
+*.log

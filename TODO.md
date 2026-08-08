@@ -24,3 +24,12 @@
 - [x] Syntax check backend lulus (node --check) setelah monitor dihapus
 - [ ] Jalankan backend + frontend → buka `/admin` (semua monitoring lewat dashboard admin frontend)
 
+## Optimasi Performa Online (Vercel)
+- [x] `frontend/src/lib/axios.js` — interceptor 401 → refresh sesi + retry sekali (kurangi error "Gagal memuat data")
+- [x] `frontend/src/client/reportsclient.js` — loadError + banner error + tombol retry (halaman tidak blank)
+- [x] `backend/src/middleware/cache.js` — middleware `cacheRead({ttl})` (cache in-memory per-user) + `bustUserCache(userId)` (invalidasi per-user)
+- [x] Pasang `cacheRead` di semua GET read-only: transactions, dashboard (summary/insight/budgets), budgets, categories, allocations, balance, profiles/me
+- [x] Panggil `bustUserCache(req.user.id)` setelah semua mutasi (POST/PUT/DELETE) di route terkait → data segar setelah perubahan
+- [ ] Deploy ulang backend ke Vercel → cek respons GET jadi HIT (header `X-Cache: HIT`) setelah request pertama per user
+- [ ] Opsional lanjutan: lazy-load `recharts` & dynamic import di halaman berat (dashboard/balance/reports) untuk mengecilkan bundle awal
+

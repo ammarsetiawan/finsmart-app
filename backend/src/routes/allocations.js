@@ -4,12 +4,13 @@ import { createId } from '@paralleldrive/cuid2'
 import { db } from '../db/index.js'
 import { allocationRules } from '../db/schema.js'
 import { requireAuth } from '../middleware/auth.js'
+import { cacheRead, bustUserCache } from '../middleware/cache.js'
 
 const router = Router()
 router.use(requireAuth)
 
 
-router.get('/', async (req, res) => {
+router.get('/', cacheRead({ ttl: 30 }), async (req, res) => {
   try {
     const rows = await db.query.allocationRules.findMany({
       where: eq(allocationRules.userId, req.user.id),
@@ -41,6 +42,7 @@ router.post('/', async (req, res) => {
         targetCategoryId: r.target_category_id || null,
       }))
     ).returning()
+    bustUserCache(req.user.id)
     res.status(201).json({ data: rows })
   } catch (e) { res.status(500).json({ error: e.message }) }
 })
