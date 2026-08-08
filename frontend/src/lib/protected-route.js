@@ -13,21 +13,15 @@ let cachedSessionPromise = null
 function getSessionCached() {
   if (!cachedSessionPromise) {
     // Memakai getSession() — supabase sudah meng-cache di localStorage,
-    // jadi ini fast-path. Paksa refresh dari refresh token di background.
+    // jadi ini fast-path tanpa blokir render. Refresh token TIDAK dipaksa
+    // di sini untuk menghindari rotasi token yang bentrok dengan request
+    // API halaman yang baru dimuat (pemicu 401 → halaman gagal load).
+    // Axios interceptor sudah menangani refresh token secara otomatis
+    // saat satu/lebih request terkena 401.
     cachedSessionPromise = supabase.auth
       .getSession()
-      .then(({ data }) => {
-        const session = data?.session ?? null
-        // Segarkan token di background tanpa memblokir render.
-        if (session?.user) {
-          supabase.auth.refreshSession()
-        }
-        return session
-      })
+      .then(({ data }) => data?.session ?? null)
       .catch(() => null)
-      .finally(() => {
-        // Biarkan promise di-cache, hasil tidak berubah untuk sesi yang sama.
-      })
   }
   return cachedSessionPromise
 }

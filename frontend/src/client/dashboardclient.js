@@ -75,6 +75,7 @@ export default function Dashboard() {
   const [summary, setSummary] = useState(null)
   const [budgets, setBudgets] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loaded,  setLoaded]  = useState(false) // data sudah berhasil dimuat (cegah tampil Rp0 sebelum selesai)
   const [error, setError] = useState(null)
   const [selectedBudget, setSelectedBudget] = useState(null)
 
@@ -86,6 +87,7 @@ export default function Dashboard() {
 
   async function loadAll() {
     setLoading(true)
+    setLoaded(false)
     setError(null)
     try {
       const [s, b] = await Promise.all([
@@ -94,7 +96,9 @@ export default function Dashboard() {
       ])
       setSummary(s.data.data)
       setBudgets(b.data.data)
+      setLoaded(true)
     } catch (e) {
+      setLoaded(false)
       setError('Gagal memuat data. Pastikan backend berjalan.')
     }
     setLoading(false)
@@ -110,11 +114,27 @@ export default function Dashboard() {
     balance: summary?.balance || 0,
   }
 
-  if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <p className="text-gray-400 text-lg animate-pulse">Memuat dashboard...</p>
-    </div>
-  )
+  if (loading || !loaded) {
+    if (error) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-500 mb-3">{error}</p>
+            <button onClick={loadAll}
+              className="px-4 py-2 bg-teal-500 text-white rounded-xl text-sm font-bold hover:bg-teal-600 transition-colors"
+            >
+              Muat Ulang
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-400 text-lg animate-pulse">Memuat dashboard...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -18,7 +18,28 @@ api.interceptors.request.use(async (config) => {
   return config
 })
 
-let retry401Started = false
+// Queue refresh sesi tunggal: ketika beberapa request gagal 401 bersamaan
+// (mis. Promise.all di halaman), semua menunggu satu refresh yang sama,
+// lalu di-retry dengan token baru. Mencegah "Gagal memuat data" palsu.
+let refreshPromise = null
+let refreshInFlight = false
+
+async function refreshToken() {
+  if (refreshPromise) return refreshPromise
+  refreshInFlight = true
+  refreshPromise = supabase.auth
+    .refreshSession()
+    .then(({ data }) => data?.session?.access_token ?? null)
+    .catch((e) => {
+      console.warn('[axios] Gagal refresh sesi:', e?.message || e)
+      return null
+    })
+    .finally(() => {
+      refreshPromise = null
+      refreshInFlight = false
+    })
+  return refreshPromise
+}
 
 api.interceptors.response.use(
   (res) => res,
@@ -30,23 +51,15 @@ api.interceptors.response.use(
     }
 
     // 401 → token mungkin kadaluarsa / sedang refresh.
-    // Segarkan sesi sekali lalu ulangi request asli satu kali.
+    // Segarkan sekali (dibagi antar request) lalu ulangi request asli.
     const isAuthEndpoint = err.config?.url?.includes('/auth')
-    if (err.response.status === 401 && !retry401Started && !isAuthEndpoint) {
-      retry401Started = true
-      try {
-        const { data } = await supabase.auth.refreshSession()
-        const token = data?.session?.access_token
-        if (token) {
-          const retryConfig = { ...err.config }
-          retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${token}` }
-          retryConfig._retried = true
-          return api.request(retryConfig)
-        }
-      } catch (refreshErr) {
-        console.warn('[axios] Gagal refresh sesi:', refreshErr?.message || refreshErr)
-      } finally {
-        retry401Started = false
+    if (err.response.status === 401 && !isAuthEndpoint && !err.config?._retried) {
+      const token = await refreshToken()
+      if (token) {
+        const retryConfig = { ...err.config }
+        retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${token}` }
+        retryConfig._retried = true
+        return api.request(retryConfig)
       }
     }
 
