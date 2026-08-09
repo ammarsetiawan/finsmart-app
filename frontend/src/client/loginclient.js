@@ -6,24 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { supabaseReady } from "@/lib/supabase";
-import { profileService } from "@/services";
-
-const ensureProfile = async (displayName, monthlyIncome = 0) => {
-  try {
-    const { data } = await profileService.getMe();
-    return data?.data ?? null;
-  } catch (error) {
-    if (error?.response?.status === 404) {
-      const { data } = await profileService.create({
-        full_name: displayName,
-        monthly_income: monthlyIncome,
-      });
-      return data?.data ?? null;
-    }
-
-    throw error;
-  }
-};
+import { ensureProfile } from "@/lib/bootstrap";
 
 // --- Komponen TextField tetap sama ---
 const TextField = ({ label, value, onChange, type = "text", className = "", icon: Icon, showPasswordToggle = false, onKeyDown }) => {

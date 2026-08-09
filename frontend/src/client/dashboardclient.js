@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { dashboardService } from '@/services';
 import { supabase } from '@/lib/supabase';
+import { bootstrapUser } from '@/lib/bootstrap';
 import Navbar from '@/components/Navbars';
 
 
@@ -83,7 +84,11 @@ export default function Dashboard() {
   const month = now.getMonth() + 1
   const year = now.getFullYear()
 
-  useEffect(() => { loadAll() }, [])
+  // Bootstrap profil otomatis untuk user baru (termasuk yang masuk via Google).
+  useEffect(() => {
+    bootstrapUser()
+    loadAll()
+  }, [])
 
   async function loadAll() {
     setLoading(true)
