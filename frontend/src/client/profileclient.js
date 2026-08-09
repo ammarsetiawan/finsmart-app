@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { User, Mail, Wallet, Pencil, Check, X } from 'lucide-react';
+import Image from 'next/image';
 import Navbar from '@/components/Navbars';
 import { profileService } from '@/services';
 import { supabase } from '@/lib/supabase';
+import { getAvatarUrl } from '@/lib/bootstrap';
 
 const fmt = (n) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n || 0)
@@ -62,7 +64,8 @@ export default function Profile() {
     })
   }
 
-  const initials = profile?.fullName?.slice(0, 2).toUpperCase() || user?.email?.slice(0, 2).toUpperCase() || 'FS'
+const initials = profile?.fullName?.slice(0, 2).toUpperCase() || user?.email?.slice(0, 2).toUpperCase() || 'FS'
+  const avatarUrl = getAvatarUrl(user)
   const joinDate = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
     : '—'
@@ -84,9 +87,15 @@ export default function Profile() {
 
         {/* Avatar + nama */}
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 mb-5 flex flex-col items-center text-center">
-          <div className="w-20 h-20 rounded-full bg-teal-500 flex items-center justify-center text-white text-2xl font-bold mb-4">
-            {initials}
-          </div>
+          {avatarUrl ? (
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-100 mb-4">
+              <Image src={avatarUrl} alt={initials} fill sizes="80px" className="object-cover" />
+            </div>
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-teal-500 flex items-center justify-center text-white text-2xl font-bold mb-4">
+              {initials}
+            </div>
+          )}
           <h1 className="text-xl font-bold text-gray-800">{profile?.fullName || 'Pengguna'}</h1>
           <p className="text-sm text-gray-400 mt-1">{user?.email}</p>
           <p className="text-xs text-gray-300 mt-1">Bergabung {joinDate}</p>

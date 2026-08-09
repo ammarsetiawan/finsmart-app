@@ -1,6 +1,23 @@
 import { supabase } from '@/lib/supabase'
 import { profileService } from '@/services'
 
+// Ambil URL avatar pengguna dari sesi Supabase saat ini.
+// Google OAuth menyimpannya di user_metadata.avatar_url / picture.
+// Mengembalikan string URL, atau null jika tidak ada (untuk fallback inisial).
+export function getAvatarUrl(user) {
+  if (!user) return null
+  const meta = user.user_metadata || {}
+  const fromGoogle = meta.avatar_url || meta.picture || meta.avatar
+  if (fromGoogle) return fromGoogle
+  if (user.identities?.length) {
+    const googleIdentity = user.identities.find(i => i.provider === 'google')
+    if (googleIdentity?.identity_data?.avatar_url) {
+      return googleIdentity.identity_data.avatar_url
+    }
+  }
+  return null
+}
+
 // Ambil nama tampilan dari sesi Supabase saat ini.
 // Urutan: user_metadata.full_name (Google / signup) -> email prefix -> fallback.
 function resolveDisplayName(user) {

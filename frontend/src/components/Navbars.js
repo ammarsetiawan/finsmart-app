@@ -9,6 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
+import { getAvatarUrl } from '../lib/bootstrap';
 import AllocationModal from './AllocationModal';
 
 const NAV_ITEMS = [
@@ -54,6 +55,18 @@ export default function Navbar() {
 
     const initials = user?.email?.slice(0, 1).toUpperCase() || 'U'
     const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+    const avatarUrl = getAvatarUrl(user)
+
+    // Rendering avatar: gambar Google jika ada, kalau tidak → lingkaran inisial.
+    const Avatar = ({ sizeCls, textCls }) => avatarUrl ? (
+        <div className={`relative ${sizeCls} rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-gray-100`}>
+            <Image src={avatarUrl} alt={displayName} fill sizes="40px" className="object-cover" />
+        </div>
+    ) : (
+        <div className={`${sizeCls} rounded-full bg-teal-500 flex items-center justify-center text-white ${textCls} font-bold shrink-0`}>
+            {initials}
+        </div>
+    )
 
     return (
         <>
@@ -94,9 +107,7 @@ export default function Navbar() {
                                     onClick={() => setDropdownOpen(v => !v)}
                                     className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-50 transition-colors"
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-white text-xs font-bold">
-                                        {initials}
-                                    </div>
+<Avatar sizeCls="w-8 h-8" textCls="text-xs" />
                                     <span className="text-sm font-medium text-gray-700">{displayName}</span>
                                     <ChevronDown size={14} className={`text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
@@ -144,10 +155,8 @@ export default function Navbar() {
                     </button>
                 </div>
 
-                <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
-                    <div className="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                        {initials}
-                    </div>
+<div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
+                    <Avatar sizeCls="w-9 h-9" textCls="text-sm" />
                     <div className="min-w-0">
                         <p className="text-sm font-semibold text-gray-800 truncate">{displayName}</p>
                         <p className="text-xs text-gray-400 truncate">{user?.email}</p>

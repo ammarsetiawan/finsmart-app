@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  images: {
+    // Izinkan avatar Google (lh3.googleusercontent.com) & Supabase storage.
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+      { protocol: 'https', hostname: '*.supabase.co' },
+    ],
+  },
+}
 
 const withPWA = require('next-pwa')({
   dest:            'public',
